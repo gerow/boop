@@ -21,6 +21,7 @@ func main() {
 }
 
 func loadCommandMap() {
+  commandMap = map[string]string{}
   commandMap["/test"] = "touch WOAH_MAN"
 }
 

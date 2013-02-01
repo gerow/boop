@@ -1,5 +1,5 @@
 all:
-	go build sproc.go
+	go build boop.go
 
 clean:
-	rm sproc
+	rm boop

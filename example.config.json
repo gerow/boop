@@ -14,5 +14,5 @@
     "command":"touch hello",
     "only_allow_ips":["192.188.1.5", "192.162.1.55"],
     "limit_rate":120
-  }
+  }]
 }

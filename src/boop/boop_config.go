@@ -3,24 +3,25 @@ package boop
 import (
   "io/ioutil"
   "encoding/json"
+  "fmt"
 )
 
 var default_config_file_locations = [...]string { "/usr/etc/boop/config.json", "./config.json" }
 
 type Command struct {
-  path string
-  command string
-  only_allow_ips []string
-  limit_rate int
+  Path string `json:"path"`
+  Command string `json:"command"`
+  OnlyAllowIps []string `json:"only_allow_ips"`
+  LimitRate int `json:"limit_rate"`
 }
 
 type Config struct {
-  port int
-  only_allow_ips []string
-  commands []Command
+  Port int `json:"port"`
+  OnlyAllowIps []string `json:"only_allow_ips"`
+  Commands []Command `json:"commands"`
 }
 
-func LoadConfig() (config Config) {
+func LoadConfig() (config *Config) {
   for _, v := range default_config_file_locations {
     ok := false
     if config, ok = LoadConfigFromFile(v); ok {
@@ -30,13 +31,18 @@ func LoadConfig() (config Config) {
   return
 }
 
-func LoadConfigFromFile(location string) (config Config, ok bool) {
+func LoadConfigFromFile(location string) (config *Config, ok bool) {
+  var conf Config
+
   file, e := ioutil.ReadFile(location)
   if e != nil {
     return config, false
   }
 
-  json.Unmarshal(file, &config)
+  err := json.Unmarshal(file, &conf)
+  if err != nil {
+    fmt.Println("error:",err)
+  }
 
-  return config, true
+  return &conf, true
 }

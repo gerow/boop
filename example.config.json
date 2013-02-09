@@ -1,7 +1,6 @@
 {
   "port":9180,
-  "only_allow_ips":
-    ["192.168.1.1","192.169.1.1"],
+  "only_allow_ips":["192.168.1.1","192.169.1.1"],
   "commands":[
   {
     "path":"/here/is/path",

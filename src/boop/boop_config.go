@@ -12,14 +12,14 @@ const post_action = "POST"
 type Command struct {
   Path string `json:"path"`
   Command string `json:"command"`
-  OnlyAllowIps []string `json:"only_allow_ips"`
-  LimitRate int `json:"limit_rate"`
-  AllowActions []string `json:"allow_actions"`
+  OnlyAllowIps []string `json:"onlyAllowIps"`
+  LimitRate int `json:"limitRate"`
+  AllowActions []string `json:"allowActions"`
 }
 
 type Config struct {
   Port int `json:"port"`
-  OnlyAllowIps []string `json:"only_allow_ips"`
+  OnlyAllowIps []string `json:"onlyAllowIps"`
   Commands []Command `json:"commands"`
 }
 

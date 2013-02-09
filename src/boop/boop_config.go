@@ -7,12 +7,14 @@ import (
 
 var default_config_file_locations = [...]string { "./config.json", "/usr/etc/boop/config.json" }
 const default_port = 9180
+const post_action = "POST"
 
 type Command struct {
   Path string `json:"path"`
   Command string `json:"command"`
   OnlyAllowIps []string `json:"only_allow_ips"`
   LimitRate int `json:"limit_rate"`
+  AllowActions []string `json:"allow_actions"`
 }
 
 type Config struct {
@@ -56,6 +58,14 @@ func LoadConfigFromBytes(data []byte) (*Config, error) {
 func fillInDefaultValues(config *Config) (*Config) {
   if (config.Port == 0) {
     config.Port = default_port;
+  }
+
+  // Make sure we allow only POST by
+  // default
+  for _, v := range config.Commands {
+    if len(v.AllowActions) == 0 {
+      v.AllowActions = append(v.AllowActions, post_action)
+    }
   }
 
   return config

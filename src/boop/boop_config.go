@@ -3,10 +3,10 @@ package boop
 import (
   "io/ioutil"
   "encoding/json"
-  "fmt"
 )
 
 var default_config_file_locations = [...]string { "/usr/etc/boop/config.json", "./config.json" }
+const default_port = 9180
 
 type Command struct {
   Path string `json:"path"`
@@ -21,28 +21,42 @@ type Config struct {
   Commands []Command `json:"commands"`
 }
 
-func LoadConfig() (config *Config) {
+func LoadConfig() (*Config, error) {
+  var err error
   for _, v := range default_config_file_locations {
-    ok := false
-    if config, ok = LoadConfigFromFile(v); ok {
-      return
+    if config, err := LoadConfigFromFile(v); err != nil {
+      return config, nil
     }
   }
-  return
+  return nil, err
 }
 
-func LoadConfigFromFile(location string) (config *Config, ok bool) {
-  var conf Config
-
-  file, e := ioutil.ReadFile(location)
-  if e != nil {
-    return config, false
-  }
-
-  err := json.Unmarshal(file, &conf)
+func LoadConfigFromFile(location string) (*Config, error) {
+  file_data, err := ioutil.ReadFile(location)
   if err != nil {
-    fmt.Println("error:",err)
+    return nil, err
   }
 
-  return &conf, true
+  return LoadConfigFromBytes(file_data)
 }
+
+func LoadConfigFromBytes(data []byte) (*Config, error) {
+  var config Config
+  err := json.Unmarshal(data, &config)
+  if err != nil {
+    return &config, err
+  }
+
+  fillInDefaultValues(&config)
+  return &config, nil
+}
+
+func fillInDefaultValues(config *Config) (*Config) {
+  if (config.Port == 0) {
+    config.Port = default_port;
+  }
+
+  return config
+}
+
+

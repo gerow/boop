@@ -3,7 +3,27 @@ package boop
 import (
   "testing"
   "os"
+  "reflect"
 )
+
+func TestLoadConfigFromFileWithDefaults(t *testing.T) {
+  const filename = "test.empty.config.json"
+
+  var expected_config Config
+
+  expected_config.Port = 9180
+
+  config, err := LoadConfigFromFile(filename)
+
+  if err != nil {
+    t.Errorf("Got error from LoadConfigFromFile:", err)
+  }
+
+  if !reflect.DeepEqual(expected_config, *config) {
+    t.Errorf("Loaded config does not match expected. Expected %v, got %v", expected_config, *config)
+  }
+
+}
 
 func TestLoadConfigFromFile(t *testing.T) {
   const filename = "test.config.json"
@@ -31,13 +51,13 @@ func TestLoadConfigFromFile(t *testing.T) {
   cwd,_ := os.Getwd()
   t.Logf("cwd is %s", cwd)
 
-  config,ok := LoadConfigFromFile(filename)
+  config,err := LoadConfigFromFile(filename)
+
+  if err != nil {
+    t.Errorf("Got error from LoadConfigFromFile:", err)
+  }
 
   t.Logf("config looks like %v", config)
-
-  if !ok {
-    t.Errorf("LoadConfigFromFile(%s) returned ok = %t", filename, ok)
-  }
 
   if config.Port != Port {
     t.Errorf("config.Port = %d, want %d", config.Port, Port)

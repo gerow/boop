@@ -5,7 +5,7 @@ import (
   "encoding/json"
 )
 
-var default_config_file_locations = [...]string { "/usr/etc/boop/config.json", "./config.json" }
+var default_config_file_locations = [...]string { "./config.json", "/usr/etc/boop/config.json" }
 const default_port = 9180
 
 type Command struct {
@@ -23,8 +23,10 @@ type Config struct {
 
 func LoadConfig() (*Config, error) {
   var err error
+  var config *Config
+
   for _, v := range default_config_file_locations {
-    if config, err := LoadConfigFromFile(v); err != nil {
+    if config, err = LoadConfigFromFile(v); err == nil {
       return config, nil
     }
   }

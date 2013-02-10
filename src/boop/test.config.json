@@ -18,5 +18,6 @@
   {
     "path":"DELETE /here/is/delete/path",
     "command":"sleep 200"
+  }
   ]
 }

@@ -38,8 +38,9 @@ func BoopMain() {
 }
 
 func httpRequestHandler(w http.ResponseWriter, req *http.Request) {
-  fmt.Println("Received request for " + req.URL.Path + " from " + requestIpAddress(req))
-  command := commandForRequest(req)
+  action_path := req.Method + " " + req.URL.Path
+  fmt.Println("Received request for " + action_path + " from " + requestIpAddress(req))
+  command := commandForActionPath(action_path)
   if command == nil {
     w.WriteHeader(404)
     fmt.Println("No associated command.  Returning 404 (Not Found).")
@@ -56,12 +57,11 @@ func httpRequestHandler(w http.ResponseWriter, req *http.Request) {
   //w.WriteHeader(200)
 }
 
-func commandForRequest(req *http.Request) *Command {
+func commandForActionPath(action_path string) *Command {
   // Just in case no commands have been defined
 
-  requested_path := req.URL.Path
   for _, v := range config.Commands {
-    if v.Path == requested_path {
+    if v.Path == action_path {
       return &v
     }
   }

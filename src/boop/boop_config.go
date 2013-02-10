@@ -14,7 +14,6 @@ type Command struct {
   Command string `json:"command"`
   OnlyAllowIps []string `json:"onlyAllowIps"`
   LimitRate int `json:"limitRate"`
-  AllowActions []string `json:"allowActions"`
 }
 
 type Config struct {
@@ -59,16 +58,5 @@ func fillInDefaultValues(config *Config) (*Config) {
   if (config.Port == 0) {
     config.Port = default_port;
   }
-
-  // Make sure we allow only POST by
-  // default
-  for _, v := range config.Commands {
-    if len(v.AllowActions) == 0 {
-      v.AllowActions = append(v.AllowActions, post_action)
-    }
-  }
-
   return config
 }
-
-

@@ -45,7 +45,7 @@ func TestLoadConfigFromFile(t *testing.T) {
 		Command{
 			"DELETE /here/is/delete/path",
 			"sleep 200",
-			[]string{},
+			nil,
 			0}}
 
 	config, err := LoadConfigFromFile(filename)

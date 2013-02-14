@@ -1,6 +1,6 @@
 package main
 
-import "boop"
+import "github.com/gerow/boop"
 
 func main() {
   boop.BoopMain()

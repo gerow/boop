@@ -7,7 +7,7 @@ import (
         "time"
 )
 
-var Locations = [...]string{"./config.json", "/usr/etc/boop/config.json"}
+var Locations = [...]string{"./config.json", "/etc/boop/config.json"}
 
 const DefaultPort = 9180
 

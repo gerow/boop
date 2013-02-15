@@ -3,6 +3,8 @@ package boop
 import (
 	"encoding/json"
 	"io/ioutil"
+        "sync"
+        "time"
 )
 
 var Locations = [...]string{"./config.json", "/usr/etc/boop/config.json"}
@@ -10,10 +12,12 @@ var Locations = [...]string{"./config.json", "/usr/etc/boop/config.json"}
 const DefaultPort = 9180
 
 type Command struct {
+        sync.Mutex            `json:"_"`
 	Path         string   `json:"path"`
 	Command      string   `json:"command"`
 	OnlyAllowIps []string `json:"onlyAllowIps"`
-	LimitRate    int      `json:"limitRate"`
+	LimitRate    int64      `json:"limitRate"`
+        LastTimeRun  time.Time      `json:"_"`
 }
 
 type Config struct {

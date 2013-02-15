@@ -7,30 +7,31 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+        "time"
 )
 
-var config *Config
+var gConfig *Config
 
 const NormalReturn = 0
 const ConfigError = 1
 const ListenError = 2
 
 func BoopMain() {
-	// Try to load the config file
+	// Try to load the gConfig file
 	var err error
-	config, err = LoadConfig()
+	gConfig, err = LoadConfig()
 	// If it doesn't load shut down
 	if err != nil {
 		fmt.Println("Error loading configuration file: " + err.Error())
-		fmt.Println("Shutting down due config error")
+		fmt.Println("Shutting down due gConfig error")
 		os.Exit(ConfigError)
 	}
-	fmt.Printf("Got config %#v\n", *config)
-	fmt.Printf("Starting http server on port %d\n", config.Port)
+	fmt.Printf("Got gConfig %#v\n", *gConfig)
+	fmt.Printf("Starting http server on port %d\n", gConfig.Port)
 	// Register our handler to handle all communications
 	http.Handle("/", http.HandlerFunc(httpRequestHandler))
 	fmt.Println("Listening...")
-	err = http.ListenAndServe("0.0.0.0:"+strconv.Itoa(config.Port), nil)
+	err = http.ListenAndServe("0.0.0.0:"+strconv.Itoa(gConfig.Port), nil)
 	if err != nil {
 		fmt.Println("ListenAndServ Error: ", err)
 		os.Exit(ListenError)
@@ -47,11 +48,20 @@ func httpRequestHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+        command.Lock()
+        defer command.Unlock()
+
 	if !authorized(req, command) {
 		w.WriteHeader(401)
 		fmt.Println("Command is valid, but user is unauthorized.  Returning 401 (Unauthorized)")
 		return
 	}
+
+        if !command.MeetsRateLimit() {
+                w.WriteHeader(429)
+                fmt.Println("Command is valid, but would violate the rate limit.  Returning 429 (Too Many Requests)")
+                return
+        }
 
         command.Execute()
         w.WriteHeader(200)
@@ -61,9 +71,9 @@ func httpRequestHandler(w http.ResponseWriter, req *http.Request) {
 func commandForActionPath(actionPath string) *Command {
 	// Just in case no commands have been defined
 
-	for _, v := range config.Commands {
+	for k, v := range gConfig.Commands {
 		if v.Path == actionPath {
-			return &v
+			return &gConfig.Commands[k]
 		}
 	}
 
@@ -82,7 +92,7 @@ func authorized(req *http.Request, command *Command) bool {
 
 	// List of lists that we should check.  The order determines precedence, though
 	// if an earlier list is empty it is ignored.
-	authLists := [...][]string{command.OnlyAllowIps, config.OnlyAllowIps}
+	authLists := [...][]string{command.OnlyAllowIps, gConfig.OnlyAllowIps}
 
 	for _, authList := range authLists {
 		if len(authList) != 0 {
@@ -104,5 +114,18 @@ func authorized(req *http.Request, command *Command) bool {
 
 func (c *Command) Execute() {
 	cmd := exec.Command(os.Getenv("SHELL"), "-c", c.Command)
-	cmd.Run()
+        (*c).LastTimeRun = time.Now()
+	go cmd.Run()
+}
+
+func (c *Command) MeetsRateLimit() bool {
+        if c.LimitRate == 0 {
+          return true
+        }
+
+        if time.Now().After(c.LastTimeRun.Add(time.Duration(c.LimitRate) * time.Second)) {
+          return true
+        }
+
+        return false
 }

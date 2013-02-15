@@ -5,10 +5,9 @@ import (
 	"io/ioutil"
 )
 
-var default_config_file_locations = [...]string{"./config.json", "/usr/etc/boop/config.json"}
+var Locations = [...]string{"./config.json", "/usr/etc/boop/config.json"}
 
-const default_port = 9180
-const post_action = "POST"
+const DefaultPort = 9180
 
 type Command struct {
 	Path         string   `json:"path"`
@@ -27,7 +26,7 @@ func LoadConfig() (*Config, error) {
 	var err error
 	var config *Config
 
-	for _, v := range default_config_file_locations {
+	for _, v := range Locations {
 		if config, err = LoadConfigFromFile(v); err == nil {
 			return config, nil
 		}
@@ -36,12 +35,12 @@ func LoadConfig() (*Config, error) {
 }
 
 func LoadConfigFromFile(location string) (*Config, error) {
-	file_data, err := ioutil.ReadFile(location)
+	fileData, err := ioutil.ReadFile(location)
 	if err != nil {
 		return nil, err
 	}
 
-	return LoadConfigFromBytes(file_data)
+	return LoadConfigFromBytes(fileData)
 }
 
 func LoadConfigFromBytes(data []byte) (*Config, error) {
@@ -57,7 +56,7 @@ func LoadConfigFromBytes(data []byte) (*Config, error) {
 
 func fillInDefaultValues(config *Config) *Config {
 	if config.Port == 0 {
-		config.Port = default_port
+		config.Port = DefaultPort
 	}
 	return config
 }

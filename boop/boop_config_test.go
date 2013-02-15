@@ -9,9 +9,9 @@ func TestLoadConfigFromFileWithDefaults(t *testing.T) {
 	t.Logf("Starting TestLoadConfigFromFileWithDefaults")
 	const filename = "test.empty.config.json"
 
-	var expected_config Config
+	var expectedConfig Config
 
-	expected_config.Port = 9180
+	expectedConfig.Port = 9180
 
 	config, err := LoadConfigFromFile(filename)
 
@@ -19,7 +19,7 @@ func TestLoadConfigFromFileWithDefaults(t *testing.T) {
 		t.Errorf("Got error from LoadConfigFromFile:", err)
 	}
 
-	gotest.AssertDeepEqual(expected_config, *config, t)
+	gotest.AssertDeepEqual(expectedConfig, *config, t)
 
 }
 

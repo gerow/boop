@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	//"os/exec"
+	"os/exec"
 	"strconv"
 	"strings"
 )
@@ -29,8 +29,8 @@ func BoopMain() {
 	fmt.Printf("Starting http server on port %d\n", config.Port)
 	// Register our handler to handle all communications
 	http.Handle("/", http.HandlerFunc(httpRequestHandler))
-	err = http.ListenAndServe("0.0.0.0:"+strconv.Itoa(config.Port), nil)
 	fmt.Println("Listening...")
+	err = http.ListenAndServe("0.0.0.0:"+strconv.Itoa(config.Port), nil)
 	if err != nil {
 		fmt.Println("ListenAndServ Error: ", err)
 		os.Exit(ListenError)
@@ -52,9 +52,10 @@ func httpRequestHandler(w http.ResponseWriter, req *http.Request) {
 		fmt.Println("Command is valid, but user is unauthorized.  Returning 401 (Unauthorized)")
 		return
 	}
-	//cmd := exec.Command(os.Getenv("SHELL"), "-c", v)
-	//go cmd.Run()
-	//w.WriteHeader(200)
+
+        command.Execute()
+        w.WriteHeader(200)
+        fmt.Printf("Command %v executed\n", command);
 }
 
 func commandForActionPath(actionPath string) *Command {
@@ -99,4 +100,9 @@ func authorized(req *http.Request, command *Command) bool {
 	// All of the lists were empty, so this server is open to
 	// connections from anyone
 	return true
+}
+
+func (c *Command) Execute() {
+	cmd := exec.Command(os.Getenv("SHELL"), "-c", c.Command)
+	cmd.Run()
 }

@@ -1,0 +1,11 @@
+Package: boop
+Version: 1.0-0
+Section: base
+Priority: optional
+Architecture: amd64
+Depends: upstart
+Maintainer: Michael Gerow <gerow.mike@gmail.com>
+Description: Boop command server
+  This service provides a lightweight http server
+  for running scripts/commands in response to http
+  queries.

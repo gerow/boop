@@ -1,5 +1,8 @@
 #!/bin/sh
 
+VERSION=1.0-0
+BOOP=$GOPATH/src/github.com/gerow/boop
+
 go install github.com/gerow/boop
 
 mkdir -p ./debian/usr/bin
@@ -11,12 +14,12 @@ mkdir -p ./debian/DEBIAN
 find ./debian -type d | xargs chmod 755
 
 cp $GOPATH/bin/boop ./debian/usr/bin
-cp $GOPATH/src/github.com/gerow/boop/etc/init/boop.conf ./debian/etc/init
-cp $GOPATH/src/github.com/gerow/boop/etc/boop/*.json ./debian/etc/boop
-cp $GOPATH/src/github.com/gerow/boop/etc/control ./debian/DEBIAN
+cp $BOOP/etc/init/boop.conf ./debian/etc/init
+cp $BOOP/etc/boop/*.json ./debian/etc/boop
+cp $BOOP/etc/control ./debian/DEBIAN
 
 dpkg-deb --build debian
 
-mv debian.deb boop_1.0-0_amd64.deb
+mv debian.deb boop_${VERSION}_amd64.deb
 
 rm -r debian
